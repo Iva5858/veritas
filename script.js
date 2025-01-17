@@ -9,16 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const span = document.getElementsByClassName('close')[0];
     const form = document.getElementById('waitlistForm');
     const countElement = document.getElementById('count');
-    let count = parseInt(countElement.textContent);
 
-    // Animation for count
-    function animateCount() {
-        const random = Math.floor(Math.random() * 3) + 1;
-        count += random;
-        countElement.textContent = count;
-    }
-
-    setInterval(animateCount, 5000);
+    // Fetch initial count
+    fetchCount();
 
     // Modal controls
     btn.onclick = () => {
@@ -35,80 +28,128 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Form submission with Google Sheets integration
+    // Form submission with validation and loading state
     form.onsubmit = async (e) => {
         e.preventDefault();
-        const email = e.target.querySelector('input[type="email"]').value;
+        
+        const emailInput = e.target.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
+        
+        // Client-side email validation
+        if (!isValidEmail(email)) {
+            showError('Please enter a valid email address');
+            return;
+        }
+
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<span class="loading-spinner"></span> Joining...';
+
         const timestamp = new Date().toISOString();
 
         try {
-            // Send to Google Sheets
             const response = await addToGoogleSheet(email, timestamp);
             
             if (response.ok) {
-                // Show success message
-                form.innerHTML = '<p style="text-align: center; color: var(--primary-color)">Thanks for joining! We\'ll be in touch soon! 🎉</p>';
-                
-                // Close modal after 2 seconds
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    // Reset form
-                    form.innerHTML = `
-                        <input type="email" placeholder="Enter your email" required>
-                        <button type="submit">Sign Up</button>
-                    `;
-                }, 2000);
+                fetchCount();
+                showSuccess();
             } else {
-                throw new Error('Failed to submit');
+                throw new Error(response.message || 'Failed to submit');
             }
         } catch (error) {
             console.error('Error:', error);
-            form.innerHTML = '<p style="text-align: center; color: #ff0000">Oops! Something went wrong. Please try again.</p>';
-            
-            setTimeout(() => {
-                form.innerHTML = `
-                    <input type="email" placeholder="Enter your email" required>
-                    <button type="submit">Sign Up</button>
-                `;
-            }, 2000);
+            showError(error.message || 'Something went wrong. Please try again.');
         }
     }
 });
 
-async function addToGoogleSheet(email, timestamp) {
+function fetchCount() {
     return new Promise((resolve, reject) => {
-        // Create a unique callback name
         const callbackName = 'jsonpCallback_' + Date.now();
-        
-        // Create script element
         const script = document.createElement('script');
-        const url = 'https://script.google.com/macros/s/AKfycby51UXjsRM-8X_qc4MXBTwUJYOPY71qqVaapi2wVzGkjcpJggRW8sMtK0KVZlLSyj6t/exec';
+        const url = 'https://script.google.com/macros/s/AKfycbyVyaRHs1HV9B2OKZiiKDM1noVomD8DHTU_NTg3PUhash4QmT_X9wOuggeJBq-BhB5S/exec';
         
-        // Add the callback function
         window[callbackName] = function(response) {
-            // Clean up
             document.body.removeChild(script);
             delete window[callbackName];
             
             if (response.status === 'success') {
-                resolve({ ok: true });
+                const countElement = document.getElementById('count');
+                countElement.textContent = response.count;
+                resolve(response.count);
+            } else {
+                reject(new Error('Failed to fetch count'));
+            }
+        };
+
+        script.src = `${url}?callback=${callbackName}`;
+        
+        script.onerror = () => {
+            document.body.removeChild(script);
+            delete window[callbackName];
+            reject(new Error('Failed to fetch count'));
+        };
+
+        document.body.appendChild(script);
+    });
+}
+
+// Update existing addToGoogleSheet function to handle the count in response
+async function addToGoogleSheet(email, timestamp) {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'jsonpCallback_' + Date.now();
+        const script = document.createElement('script');
+        const url = 'https://script.google.com/macros/s/AKfycbyVyaRHs1HV9B2OKZiiKDM1noVomD8DHTU_NTg3PUhash4QmT_X9wOuggeJBq-BhB5S/exec';
+        
+        window[callbackName] = function(response) {
+            document.body.removeChild(script);
+            delete window[callbackName];
+            
+            if (response.status === 'success') {
+                resolve({ ok: true, count: response.count });
             } else {
                 reject(new Error('Failed to submit'));
             }
         };
 
-        // Create URL with parameters
         script.src = `${url}?callback=${callbackName}&email=${encodeURIComponent(email)}&timestamp=${encodeURIComponent(timestamp)}`;
         
-        // Handle errors
         script.onerror = () => {
-            // Clean up
             document.body.removeChild(script);
             delete window[callbackName];
             reject(new Error('Failed to submit'));
         };
 
-        // Add script to document
         document.body.appendChild(script);
     });
+}
+
+function isValidEmail(email) {
+    // Regular expression for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+function showError(message) {
+    const form = document.getElementById('waitlistForm');
+    form.innerHTML = `
+        <p style="text-align: center; color: #ff0000">${message}</p>
+        <input type="email" placeholder="Enter your email" required>
+        <button type="submit">Sign Up</button>
+    `;
+}
+
+function showSuccess() {
+    const form = document.getElementById('waitlistForm');
+    const modal = document.getElementById('waitlistModal');
+    
+    form.innerHTML = '<p style="text-align: center; color: var(--primary-color)">Thanks for joining! We\'ll be in touch soon! 🎉</p>';
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        form.innerHTML = `
+            <input type="email" placeholder="Enter your email" required>
+            <button type="submit">Sign Up</button>
+        `;
+    }, 2000);
 } 
