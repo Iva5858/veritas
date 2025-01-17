@@ -227,6 +227,9 @@ form button[type="submit"] {
     font-weight: 700;
     transition: all 0.2s ease;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 form button[type="submit"]:hover {
@@ -236,6 +239,13 @@ form button[type="submit"]:hover {
 
 form button[type="submit"]:active {
     transform: translateY(0);
+}
+
+form button[type="submit"]:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
 }
 
 @media (max-width: 480px) {
@@ -270,4 +280,20 @@ form button[type="submit"]:active {
     h1 {
         font-size: 2.5rem;
     }
+} 
+
+/* Add this to your existing CSS */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 } 
