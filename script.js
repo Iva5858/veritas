@@ -1,8 +1,3 @@
-// Initialize Google Sheets API
-// const SHEET_ID = '18liLfOfEZCvX9Q8DVbCR0emrg_5Fo_b1MAhOe2Os-0M';
-// const SHEET_TAB_NAME = 'Sheet1';
-// const GOOGLE_CLOUD_API_KEY = 'AIzaSyAyJwD7r66D6Av24bouCrtkwgHuaSjSku0';
-
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('waitlistModal');
     const btn = document.getElementById('joinWaitlist');
