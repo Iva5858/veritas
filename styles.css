@@ -25,8 +25,11 @@ nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    position: sticky;
+    position: fixed;
     top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
     z-index: 1000;
 }
 
@@ -322,11 +325,22 @@ form button[type="submit"]:disabled {
     .hero {
         flex-direction: column;
         text-align: center;
+        padding: 2rem 1rem;
     }
     
     .hero-content {
-        padding-right: 0;
-        margin-bottom: 2rem;
+        padding: 2rem 1rem;
+        margin: 0;
+        width: 100%;
+    }
+    
+    .subtitle {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+    
+    .cta-container {
+        padding: 0 1rem;
     }
     
     .features {
@@ -342,11 +356,72 @@ form button[type="submit"]:disabled {
     }
     
     .steps-container {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr;  /* Force single column on mobile */
+        padding: 0 2rem;
+        gap: 2rem;
+        margin: 2rem auto;
+        max-width: 400px;  /* Limit width on mobile */
+    }
+    
+    .step-card {
+        padding: 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .step-card h3 {
+        font-size: 1.2rem;
     }
     
     .build-public-links {
         flex-direction: column;
+    }
+    
+    .tech-explanation {
+        padding: 1.5rem;
+        margin: 0;
+        width: 100%;
+        overflow-x: hidden;
+    }
+    
+    .agent-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0;
+        width: 100%;
+    }
+    
+    .agent-card {
+        width: 100%;
+        padding: 1.5rem;
+        margin: 0;
+    }
+
+    .process-visualization {
+        flex-direction: column;
+        gap: 2rem;
+        padding: 2rem;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .process-step {
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    .step-connector {
+        position: absolute;
+        width: 3px;
+        height: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        top: auto;
+        bottom: -40px;
+    }
+
+    .process-step:last-child .step-connector {
+        display: none;
     }
 }
 
@@ -367,9 +442,10 @@ form button[type="submit"]:disabled {
 }
 
 .section {
-    padding: 4rem 2rem;
+    padding: 4rem 1rem;
     max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .section h2 {
@@ -393,8 +469,9 @@ form button[type="submit"]:disabled {
 
 .section-content {
     text-align: center;
-    max-width: 800px;
+    max-width: 1200px;
     margin: 0 auto;
+    width: 100%;
 }
 
 .steps-container {
@@ -402,6 +479,9 @@ form button[type="submit"]:disabled {
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
     margin-top: 2rem;
+    padding: 0 1rem;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 .step-card {
@@ -427,10 +507,11 @@ form button[type="submit"]:disabled {
 
 .tech-explanation {
     background-color: white;
-    padding: 3rem;
+    padding: 2rem;
     border-radius: 24px;
     text-align: left;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin: 0 1rem;
 }
 
 .tech-explanation h3 {
@@ -459,9 +540,6 @@ form button[type="submit"]:disabled {
     padding: 2rem;
     border-radius: 20px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
 }
 
 .agent-card:hover {
@@ -581,24 +659,34 @@ form button[type="submit"]:disabled {
 
 /* Responsive adjustments */
 @media (max-width: 968px) {
-    .agent-cards {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-    }
-
     .process-visualization {
         flex-direction: column;
-        gap: 2rem;
-        padding: 2rem 1rem;
+        align-items: center;
+        gap: 3rem;
+        padding: 2rem;
+    }
+
+    .process-step {
+        width: 100%;
+        max-width: 250px;
+        position: relative;
     }
 
     .step-connector {
+        position: absolute;
         width: 3px;
         height: 40px;
-        top: 60px;
-        right: auto;
         left: 50%;
+        top: 100%;
         transform: translateX(-50%);
+    }
+
+    .step-icon {
+        margin: 0 auto 1rem;
+    }
+
+    .process-step:last-child .step-connector {
+        display: none;
     }
 }
 
@@ -1354,4 +1442,56 @@ html {
 
 .contact-button.linkedin:hover {
     box-shadow: 0 6px 20px rgba(0, 119, 181, 0.3);
+}
+
+/* Add padding to main to account for fixed header */
+main {
+    padding-top: 80px; /* Adjust this value based on your header height */
+}
+
+@media (max-width: 768px) {
+    .steps-container {
+        grid-template-columns: 1fr;
+        padding: 0 2rem;
+        gap: 2rem;
+    }
+
+    .step-card {
+        width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .section {
+        padding: 3rem 1rem;
+    }
+
+    .section-content {
+        padding: 0;
+    }
+
+    .tech-explanation {
+        margin: 0;
+        border-radius: 0;
+    }
+
+    .agent-cards {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .agent-card {
+        padding: 1.5rem;
+    }
+
+    .agent-tasks {
+        padding-left: 1rem;
+        margin-right: 1rem;
+    }
+
+    .agent-tasks li {
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
 } 
