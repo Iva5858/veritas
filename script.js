@@ -1,4 +1,3 @@
-// Logo click Easter egg
 let logoClickCount = 0;
 const logo = document.querySelector('.logo');
 const hannahImage = document.querySelector('#hannah-image');
